@@ -1,5 +1,8 @@
-name: 'Gigalixir Action'
+name: 'Gigalixir Review Action'
 description: 'Deploy to Gigalixir'
+branding:
+  icon: 'arrow-up-circle'
+  color: 'green'
 inputs:
   GIGALIXIR_USERNAME:
     description: 'Your Gigalixir username'
@@ -11,7 +14,7 @@ inputs:
     description: 'Your ssh private key that is paired with a public key that is uploaded to Gigalixir'
     required: true
   GIGALIXIR_APP:
-    description: 'Your gigalixir app name'
+    description: 'Your gigalixir app name.  Will be created if not existing'
     required: true
   MIGRATIONS:
     description: 'Configuration for migrations'
