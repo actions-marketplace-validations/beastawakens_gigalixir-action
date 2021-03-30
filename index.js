@@ -48,6 +48,36 @@ async function waitForNewRelease(oldRelease, app, attempts) {
   }
 }
 
+async function appExists(app) {
+  let appOutput = '';
+
+  const options = {
+    listeners: {
+      stdout: data => {
+        appOutput += data.toString();
+      }
+    }
+  };
+
+  await core.group("Retrieving current apps", async () => {
+    await exec.exec(`gigalixir apps`, [], options);
+  });
+
+  const apps = JSON.parse(appOutput);
+  for (let i = 0; i < apps.length; i++) {
+    if (apps[i].unique_name == app) {
+      return true
+    }
+  }
+  return false;
+}
+
+async function createApp(app) {
+  await core.group("Creating new app", async () => {
+    await exec.exec(`gigalixir apps:create -n ${app}`, [], options);
+  });
+}
+
 async function getCurrentRelease(app) {
   let releasesOutput = '';
 
@@ -97,6 +127,16 @@ async function run() {
     await core.group("Setting git remote for gigalixir", async () => {
       await exec.exec(`gigalixir git:remote ${gigalixirApp}`);
     });
+
+    const existingApp = await core.group("Checking existing apps", async () => {
+      return await appExists(gigalixirApp);
+    });
+
+    if (!existingApp) {
+      await core.group("Creating new apps", async () => {
+        return await createApp(gigalixirApp);
+      });
+    }
 
     const currentRelease = await core.group("Getting current release", async () => {
       return await getCurrentRelease(gigalixirApp);
