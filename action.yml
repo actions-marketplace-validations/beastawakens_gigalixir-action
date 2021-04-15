@@ -1,26 +1,37 @@
-name: 'Gigalixir Review Action'
-description: 'Deploy to Gigalixir'
+name: "Gigalixir Review Action"
+description: "Deploy to Gigalixir"
 branding:
-  icon: 'arrow-up-circle'
-  color: 'green'
+  icon: "arrow-up-circle"
+  color: "green"
 inputs:
   GIGALIXIR_USERNAME:
-    description: 'Your Gigalixir username'
+    description: "Your Gigalixir username"
     required: true
   GIGALIXIR_PASSWORD:
-    description: 'Your Gigalixir password'
+    description: "Your Gigalixir password"
     required: true
   SSH_PRIVATE_KEY:
-    description: 'Your ssh private key that is paired with a public key that is uploaded to Gigalixir'
+    description: "Your ssh private key that is paired with a public key that is uploaded to Gigalixir"
     required: true
   GIGALIXIR_APP:
-    description: 'Your gigalixir app name.  Will be created if not existing'
+    description: "Your gigalixir app name.  Will be created if not existing"
     required: true
   MIGRATIONS:
-    description: 'Configuration for migrations'
+    description: "Configuration for migrations"
     required: true
     default: true
+  CREATE_DATABASE:
+    description: "Automatically create a free database for a new app"
+    required: true
+    default: true
+  SET_URL_HOST:
+    description: "Set up the URL_HOST env var for a new app"
+    required: false
+    default: true
+  CONFIG:
+    description: "Configuration for env vars"
+    required: false
 
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"

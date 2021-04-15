@@ -72,7 +72,7 @@ async function appExists(app) {
   return false;
 }
 
-async function createApp(app) {
+async function createApp(app, createDatabase, setUrlHost, configValues) {
   let appCreationOutput = '';
 
   const options = {
@@ -87,14 +87,29 @@ async function createApp(app) {
     await exec.exec(`gigalixir apps:create -n ${app}`, [], options);
   });
 
-  await core.group("Creating database for app", async () => {
-    await exec.exec(`gigalixir pg:create --free -y`, [], options);
-  });
+  if (createDatabase) {
+    await core.group("Creating Database for app", async () => {
+      await exec.exec(`gigalixir pg:create -a ${app} --free --yes`, [], options);
+    });
+  }
 
-  await core.group("Setting URL_HOST for app", async () => {
-    await exec.exec(`gigalixir config:set URL_HOST=${app}.gigalixirapp.com`, [], options);
-  });
+  if (setUrlHost) {
+    await core.group("Setting URL_HOST for app", async () => {
+      await exec.exec(`gigalixir config:set -a ${app} URL_HOST=${app}.gigalixirapp.com`, [], options);
+    });
+  }
 
+  var configs = configValues.split(/\r?\n/);
+  for (let i of configs) {
+    var index = configs[i].indexOf('=')
+    if (index != -1) {
+      var key = configs[i].slice(0, index);
+      var value = configs[i].slice(index+1);
+      await core.group(`Setting ${key} for app`, async () => {
+        await exec.exec(`gigalixir config:set -a ${app} ${key}=${value}`, [], options);
+      });
+    }
+  }
 }
 
 async function getCurrentRelease(app) {
@@ -129,11 +144,17 @@ async function run() {
     const baseInputOptions = {
       required: true
     };
+    const otherInputOptions = {
+      required: false
+    }
     const gigalixirUsername = core.getInput('GIGALIXIR_USERNAME', baseInputOptions);
     const gigalixirPassword = core.getInput('GIGALIXIR_PASSWORD', baseInputOptions);
     const sshPrivateKey = core.getInput('SSH_PRIVATE_KEY', baseInputOptions);
     const gigalixirApp = core.getInput('GIGALIXIR_APP', baseInputOptions);
     const migrations = core.getInput('MIGRATIONS', baseInputOptions);
+    const createDatabase = core.getInput('CREATE_DATABASE', baseInputOptions);
+    const setUrlHost = core.getInput('SET_URL_HOST', otherInputOptions);
+    const configValues = core.getInput('CONFIG_VALUES', otherInputOptions);
 
     await core.group("Installing gigalixir", async () => {
       await exec.exec('pip3 install gigalixir')
@@ -153,7 +174,7 @@ async function run() {
 
     if (!existingApp) {
       await core.group("Creating new apps", async () => {
-        return await createApp(gigalixirApp);
+        return await createApp(gigalixirApp, createDatabase, setUrlHost, configValues);
       });
     }
 
