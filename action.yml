@@ -31,6 +31,7 @@ inputs:
   CONFIG:
     description: "Configuration for env vars"
     required: false
+    default: ""
 
 runs:
   using: "node12"

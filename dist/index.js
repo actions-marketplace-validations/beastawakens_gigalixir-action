@@ -1108,16 +1108,16 @@ async function createApp(app, createDatabase, setUrlHost, configValues) {
   }
 
   var configs = configValues.split(/\r?\n/);
-  for (let i of configs) {
-    var index = configs[i].indexOf('=')
+  configs.forEach(async function(config) {
+    var index = config.indexOf('=')
     if (index != -1) {
-      var key = configs[i].slice(0, index);
-      var value = configs[i].slice(index+1);
+      var key = config.slice(0, index);
+      var value = config.slice(index+1);
       await core.group(`Setting ${key} for app`, async () => {
         await exec.exec(`gigalixir config:set -a ${app} ${key}=${value}`, [], options);
       });
     }
-  }
+  })
 }
 
 async function getCurrentRelease(app) {
