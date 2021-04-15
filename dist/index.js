@@ -1096,7 +1096,7 @@ async function createApp(app) {
   });
 
   await core.group("Creating database for app", async () => {
-    await exec.exec(`gigalixir pg:create --free`, [], options);
+    await exec.exec(`gigalixir pg:create --free -y`, [], options);
   });
 
   await core.group("Setting URL_HOST for app", async () => {
