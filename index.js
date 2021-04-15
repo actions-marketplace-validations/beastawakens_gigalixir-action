@@ -86,6 +86,15 @@ async function createApp(app) {
   await core.group("Creating new app", async () => {
     await exec.exec(`gigalixir apps:create -n ${app}`, [], options);
   });
+
+  await core.group("Creating database for app", async () => {
+    await exec.exec(`gigalixir pg:create --free`, [], options);
+  });
+
+  await core.group("Setting URL_HOST for app", async () => {
+    await exec.exec(`gigalixir config:set URL_HOST=${app}.gigalixirapp.com`, [], options);
+  });
+
 }
 
 async function getCurrentRelease(app) {
