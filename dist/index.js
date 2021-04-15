@@ -1081,6 +1081,16 @@ async function appExists(app) {
 }
 
 async function createApp(app) {
+  let appCreationOutput = '';
+
+  const options = {
+    listeners: {
+      stdout: data => {
+        appCreationOutput += data.toString();
+      }
+    }
+  };
+
   await core.group("Creating new app", async () => {
     await exec.exec(`gigalixir apps:create -n ${app}`, [], options);
   });
