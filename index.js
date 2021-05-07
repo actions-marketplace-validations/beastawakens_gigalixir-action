@@ -184,7 +184,7 @@ async function run() {
 
     if (setUrlHost) {
       await core.group("Setting URL_HOST for app", async () => {
-        await exec.exec(`gigalixir config:set -a ${app} URL_HOST=${app}.gigalixirapp.com`, [], options);
+        await exec.exec(`gigalixir config:set -a ${gigalixirApp} URL_HOST=${gigalixirApp}.gigalixirapp.com`, [], options);
       });
     }
 
