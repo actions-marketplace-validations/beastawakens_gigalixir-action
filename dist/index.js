@@ -1095,6 +1095,10 @@ async function createApp(app, createDatabase, setUrlHost, configValues) {
     await exec.exec(`gigalixir apps:create -n ${app}`, [], options);
   });
 
+  await core.group("Scaling new app", async () => {
+    await exec.exec(`gigalixir ps:scale --replicas=1 -a ${app}`, [], options);
+  });
+  
   if (createDatabase) {
     await core.group("Creating Database for app", async () => {
       await exec.exec(`gigalixir pg:create -a ${app} --free --yes`, [], options);
