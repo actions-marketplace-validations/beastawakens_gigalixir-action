@@ -37,7 +37,7 @@ async function waitForNewRelease(oldRelease, app, attempts) {
   const maxAttempts = 60;
 
   await core.group("Scaling new app", async () => {
-    await exec.exec(`gigalixir ps:scale --replicas=1 -a ${app}`, [], options);
+    await exec.exec(`gigalixir ps:scale --replicas=1 -a ${app}`);
   });
 
   if (await isNextReleaseHealthy(oldRelease + 1, app)) {
