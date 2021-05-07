@@ -1044,6 +1044,10 @@ async function isNextReleaseHealthy(release, app) {
 async function waitForNewRelease(oldRelease, app, attempts) {
   const maxAttempts = 60;
 
+  await core.group("Scaling new app", async () => {
+    await exec.exec(`gigalixir ps:scale --replicas=1 -a ${app}`, [], options);
+  });
+
   if (await isNextReleaseHealthy(oldRelease + 1, app)) {
     return await Promise.resolve(true);
   } else {
@@ -1093,10 +1097,6 @@ async function createApp(app, createDatabase, setUrlHost, configValues) {
 
   await core.group("Creating new app", async () => {
     await exec.exec(`gigalixir apps:create -n ${app}`, [], options);
-  });
-
-  await core.group("Scaling new app", async () => {
-    await exec.exec(`gigalixir ps:scale --replicas=1 -a ${app}`, [], options);
   });
   
   if (createDatabase) {
