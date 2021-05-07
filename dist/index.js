@@ -1084,7 +1084,7 @@ async function appExists(app) {
   return false;
 }
 
-async function createApp(app, createDatabase, setUrlHost, configValues) {
+async function createApp(app, createDatabase, configValues) {
   let appCreationOutput = '';
 
   const options = {
@@ -1102,12 +1102,6 @@ async function createApp(app, createDatabase, setUrlHost, configValues) {
   if (createDatabase) {
     await core.group("Creating Database for app", async () => {
       await exec.exec(`gigalixir pg:create -a ${app} --free --yes`, [], options);
-    });
-  }
-
-  if (setUrlHost) {
-    await core.group("Setting URL_HOST for app", async () => {
-      await exec.exec(`gigalixir config:set -a ${app} URL_HOST=${app}.gigalixirapp.com`, [], options);
     });
   }
 
@@ -1195,6 +1189,12 @@ async function run() {
     });
 
     core.info(formatReleaseMessage(currentRelease));
+
+    if (setUrlHost) {
+      await core.group("Setting URL_HOST for app", async () => {
+        await exec.exec(`gigalixir config:set -a ${app} URL_HOST=${app}.gigalixirapp.com`, [], options);
+      });
+    }
 
     await core.group("Deploying to gigalixir", async () => {
       await exec.exec("git push -f gigalixir HEAD:refs/heads/master");
