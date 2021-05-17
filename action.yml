@@ -24,6 +24,10 @@ inputs:
     description: "Automatically create a free database for a new app"
     required: true
     default: true
+  DATABASE_URL:
+    description: "Pass in the URL to an existing Database to use"
+    required: false
+    default: ""
   SET_URL_HOST:
     description: "Set up the URL_HOST env var for a new app"
     required: false

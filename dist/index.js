@@ -1159,6 +1159,7 @@ async function run() {
     const gigalixirApp = core.getInput('GIGALIXIR_APP', baseInputOptions);
     const migrations = core.getInput('MIGRATIONS', baseInputOptions);
     const createDatabase = core.getInput('CREATE_DATABASE', baseInputOptions);
+    const databaseUrl = core.getInput('DATABASE_URL', otherInputOptions);
     const setUrlHost = core.getInput('SET_URL_HOST', otherInputOptions);
     const configValues = core.getInput('CONFIG_VALUES', otherInputOptions);
 
@@ -1189,6 +1190,12 @@ async function run() {
     });
 
     core.info(formatReleaseMessage(currentRelease));
+
+    if (databaseUrl) {
+      await core.group("Setting DATABASE_URL for app", async () => {
+        await exec.exec(`gigalixir config:set -a ${gigalixirApp} DATABASE_URL=${databaseUrl}`);
+      });
+    }
 
     if (setUrlHost) {
       await core.group("Setting URL_HOST for app", async () => {
