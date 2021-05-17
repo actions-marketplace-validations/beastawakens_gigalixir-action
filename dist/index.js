@@ -1198,15 +1198,15 @@ async function run() {
 
       if (!existingApp) {
         await core.group("Setting up new Database for app", async () => {
-          await exec.exec(`DATABASE_URL=${databaseUrl} gigalixir run mix ecto.create -a ${gigalixirApp}`);
+          await exec.exec(`gigalixir run mix ecto.create -a ${gigalixirApp}`);
         });
 
         await core.group("Migrating new Database for app", async () => {
-          await exec.exec(`DATABASE_URL=${databaseUrl} gigalixir run mix ecto.migrate -a ${gigalixirApp}`);
+          await exec.exec(`gigalixir run mix ecto.migrate -a ${gigalixirApp}`);
         });
 
         await core.group("Seeding new Database for app", async () => {
-          await exec.exec(`DATABASE_URL=${databaseUrl} gigalixir run mix run priv/repo/seeds.exs -a ${gigalixirApp}`);
+          await exec.exec(`gigalixir run mix run priv/repo/seeds.exs -a ${gigalixirApp}`);
         });
       }
     }
