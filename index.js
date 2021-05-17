@@ -187,20 +187,6 @@ async function run() {
       await core.group("Setting DATABASE_URL for app", async () => {
         await exec.exec(`gigalixir config:set -a ${gigalixirApp} DATABASE_URL=${databaseUrl}`);
       });
-
-      if (!existingApp) {
-        await core.group("Setting up new Database for app", async () => {
-          await exec.exec(`gigalixir run mix ecto.create -a ${gigalixirApp}`);
-        });
-
-        await core.group("Migrating new Database for app", async () => {
-          await exec.exec(`gigalixir run mix ecto.migrate -a ${gigalixirApp}`);
-        });
-
-        await core.group("Seeding new Database for app", async () => {
-          await exec.exec(`gigalixir run mix run priv/repo/seeds.exs -a ${gigalixirApp}`);
-        });
-      }
     }
 
     if (setUrlHost) {
@@ -222,22 +208,40 @@ async function run() {
         await waitForNewRelease(currentRelease, gigalixirApp, 1);
       });
 
-      try {
-        await core.group("Running migrations", async () => {
-          await exec.exec(`gigalixir ps:migrate -a ${gigalixirApp}`)
+      if (!existingApp) {
+        await core.group("Setting up new Database for app", async () => {
+          await exec.exec(`gigalixir run mix ecto.create -a ${gigalixirApp}`);
         });
-      } catch (error) {
-        if (currentRelease === 0) {
-          core.warning("Migration failed");
-        } else {
-          core.warning(`Migration failed, rolling back to the previous release: ${currentRelease}`);
-          await core.group("Rolling back", async () => {
-            await exec.exec(`gigalixir releases:rollback -a ${gigalixirApp}`)
-          });
-        }
 
-        core.setFailed(error.message);
+        await core.group("Migrating new Database for app", async () => {
+          await exec.exec(`gigalixir run mix ecto.migrate -a ${gigalixirApp}`);
+        });
+
+        await core.group("Seeding new Database for app", async () => {
+          await exec.exec(`gigalixir run mix run priv/repo/seeds.exs -a ${gigalixirApp}`);
+        });
+      } else {
+        await core.group("Migrating Database for app", async () => {
+          await exec.exec(`gigalixir run mix ecto.migrate -a ${gigalixirApp}`);
+        });
       }
+
+      // try {
+      //   await core.group("Running migrations", async () => {
+      //     await exec.exec(`gigalixir ps:migrate -a ${gigalixirApp}`)
+      //   });
+      // } catch (error) {
+      //   if (currentRelease === 0) {
+      //     core.warning("Migration failed");
+      //   } else {
+      //     core.warning(`Migration failed, rolling back to the previous release: ${currentRelease}`);
+      //     await core.group("Rolling back", async () => {
+      //       await exec.exec(`gigalixir releases:rollback -a ${gigalixirApp}`)
+      //     });
+      //   }
+
+      //   core.setFailed(error.message);
+      // }
     }
   } catch (error) {
     core.setFailed(error.message);

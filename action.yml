@@ -23,7 +23,7 @@ inputs:
   CREATE_DATABASE:
     description: "Automatically create a free database for a new app"
     required: true
-    default: true
+    default: false
   DATABASE_URL:
     description: "Pass in the URL to an existing Database to use"
     required: false
